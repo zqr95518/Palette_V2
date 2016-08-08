@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hhigh.palette_v2.persistence.PaletteMapper">
+    <resultMap type="com.hhigh.palette_v2.domain.Palette" id="paletteMapper">
+        <result column="name" property="name"/>
+        <result column="color" property="color"/>
+    </resultMap>
+
+    <select id="getall" resultMap="paletteMapper">
+        select * from records
+    </select>
+
+</mapper>
