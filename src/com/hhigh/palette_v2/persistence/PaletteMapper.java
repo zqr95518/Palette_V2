@@ -11,4 +11,6 @@ import java.util.List;
 @Repository
 public interface PaletteMapper {
     List<Palette> getall();
+
+    void save(Palette palette);
 }
