@@ -19,7 +19,15 @@ public class PaletteService {
         return paletteMapper.getall();
     }
 
-    public void save(Palette palette){
+    public void save(Palette palette) {
         paletteMapper.save(palette);
+    }
+
+    public void delete(String id) {
+        paletteMapper.delete(id);
+    }
+
+    public void update(Palette palette) {
+        paletteMapper.update(palette);
     }
 }

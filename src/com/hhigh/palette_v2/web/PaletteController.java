@@ -52,4 +52,32 @@ public class PaletteController {
         response.getWriter().flush();
         response.getWriter().close();
     }
+
+    @RequestMapping("/delete")
+    public void delete(HttpServletRequest request, HttpServletResponse response)throws IOException {
+        response.setContentType("text/html;charset=utf-8");
+        String id = request.getParameter("id");
+        paletteService.delete(id);
+        response.setCharacterEncoding("utf-8");
+        response.setContentType("text/html");
+        response.getWriter().write(id);
+        response.getWriter().flush();
+        response.getWriter().close();
+    }
+
+    @RequestMapping("/update")
+    public void update(HttpServletRequest request, HttpServletResponse response)throws IOException {
+        Palette palette = new Palette();
+        response.setContentType("text/html;charset=utf-8");
+        palette.setName(request.getParameter("name"));
+        palette.setColor(request.getParameter("color"));
+        palette.setId(request.getParameter("id"));
+        JSONObject jsonObject = JSONObject.fromObject(palette);
+        paletteService.update(palette);
+        response.setCharacterEncoding("utf-8");
+        response.setContentType("text/html");
+        response.getWriter().write(jsonObject.toString());
+        response.getWriter().flush();
+        response.getWriter().close();
+    }
 }

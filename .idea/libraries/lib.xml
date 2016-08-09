@@ -56,6 +56,7 @@
       <root url="jar://$PROJECT_DIR$/web/WEB-INF/lib/spring-webmvc-portlet-3.2.8.RELEASE.jar!/" />
       <root url="jar://$PROJECT_DIR$/web/WEB-INF/lib/standard.jar!/" />
       <root url="jar://$PROJECT_DIR$/web/WEB-INF/lib/sqlite-jdbc-3.8.11.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/web/WEB-INF/lib/log4j-1.2.16.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

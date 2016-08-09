@@ -13,4 +13,8 @@ public interface PaletteMapper {
     List<Palette> getall();
 
     void save(Palette palette);
+
+    void delete(String id);
+
+    void update(Palette palette);
 }
