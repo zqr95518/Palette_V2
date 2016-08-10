@@ -2,11 +2,14 @@ package com.hhigh.palette_v2.web;
 
 import com.hhigh.palette_v2.domain.Palette;
 import com.hhigh.palette_v2.service.PaletteService;
+import net.sf.json.JSON;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -38,17 +41,12 @@ public class PaletteController {
         }
     }
 
-    @RequestMapping("/save")
-    public void save(HttpServletRequest request, HttpServletResponse response)throws IOException {
-        Palette palette = new Palette();
-        response.setContentType("text/html;charset=utf-8");
-        palette.setName(request.getParameter("name"));
-        palette.setColor(request.getParameter("color"));
-        JSONObject jsonObject = JSONObject.fromObject(palette);
+    @RequestMapping(value = "/save", method = {RequestMethod.POST}, consumes = "application/json")
+    public void save(@RequestBody Palette palette, HttpServletRequest request, HttpServletResponse response)throws IOException {
         paletteService.save(palette);
         response.setCharacterEncoding("utf-8");
         response.setContentType("text/html");
-        response.getWriter().write(jsonObject.toString());
+        response.getWriter().write(JSONObject.fromObject(palette).toString());
         response.getWriter().flush();
         response.getWriter().close();
     }
@@ -69,11 +67,11 @@ public class PaletteController {
     public void update(HttpServletRequest request, HttpServletResponse response)throws IOException {
         Palette palette = new Palette();
         response.setContentType("text/html;charset=utf-8");
-        palette.setName(request.getParameter("name"));
-        palette.setColor(request.getParameter("color"));
-        palette.setId(request.getParameter("id"));
-        JSONObject jsonObject = JSONObject.fromObject(palette);
+        palette.setName((String)request.getParameter("name"));
+        palette.setColor((String)request.getParameter("color"));
+        palette.setId((String)request.getParameter("id"));
         paletteService.update(palette);
+        JSONObject jsonObject = JSONObject.fromObject(palette);
         response.setCharacterEncoding("utf-8");
         response.setContentType("text/html");
         response.getWriter().write(jsonObject.toString());

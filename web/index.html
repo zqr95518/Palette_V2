@@ -133,17 +133,42 @@
             });
             $("#save").click(function () {
                 if (confirm("是否保存？")) {
+                    var obj = {
+                        "id":"",
+                        "name": $("#name").val(),
+                        "color": getcurrectcolor()
+                    };
                     $.ajax({
+                        type: "post",
                         url: "mvc/PaletteController/save",
-                        scriptCharset: 'UTF-8',
-                        dataType: 'json',
-                        data: {name: $("#name").val(), color: getcurrectcolor()},
+                        dataType:"json",
+                        contentType:"application/json",
+                        data: JSON.stringify(obj),
                         success: function (data) {
                             getdatas();
                         },
                         error: function (e) {
-                            alert(e);
+                            alert(JSON.stringify(e));
                         }
+                    });
+                }
+            });
+            $("#myform").submit(function () {
+                if (confirm("是否保存？")) {
+                    $.ajax({
+                        type: "post",
+                        headers:{
+                            "Accept":"application/json"
+                        },
+                        url: "mvc/PaletteController/update",
+                        scriptCharset: 'UTF-8',
+                        dataType: 'json',
+                        data: $("#myform").serialize(),
+/*                        success: function () {
+                         alert("a");
+                         $("#myModal").modal('hide');
+                         getdatas();
+                         }*/
                     });
                 }
             });
@@ -205,30 +230,10 @@
             height = "300px";
             width = "400px";
             var tr1 = node.parentNode.parentNode;
-            $("#m_id").text(tr1.cells[0].innerText);
+            $("#m_id").val(tr1.cells[0].innerText);
             $("#m_name").val(tr1.cells[1].innerText);
             $("#m_color").val(tr1.cells[3].innerText);
             $("#myModal").modal('show');
-        }
-        function update() {
-            var id = $("#m_id").text();
-            var color = $("#m_color").val();
-            var name = $("#m_name").val();
-            if (confirm("确认修改？")) {
-                $.ajax({
-                    url: "mvc/PaletteController/update",
-                    scriptCharset: 'UTF-8',
-                    dataType: 'json',
-                    data: {id: id, color: color, name: name},
-                    success: function (data) {
-                        $("#myModal").modal('hide');
-                        getdatas();
-                    },
-                    error: function (e) {
-                        alert(e);
-                    }
-                });
-            }
         }
         function Sixteen2RGB(a) {
             if (a.substr(0, 1) == "#") {
@@ -299,10 +304,10 @@
             </table>
         </div>
     </div>
-    <div class="row col-sm-8 col-sm-offset-2">
-        <table class="table pull-right">
+    <div class="row col-sm-6 col-sm-offset-3">
+        <table class="table pull-right" style="border: hidden">
             <tr>
-                <td width="50%"><h3 style="text-align: center" id="warn">&nbsp;</h3></td>
+                <td width="40%"><h3 style="text-align: center" id="warn">&nbsp;</h3></td>
                 <td><label class="control-label pull-right">名称：</label></td>
                 <td><input type="text" class="form-control pull-right" id="name"></td>
                 <td>
@@ -345,19 +350,20 @@
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title" id="myModalLabel">修改颜色</h4>
             </div>
-            <div class="modal-body">
-                <table class="table table-bordered">
-                    <tr>
-                        <td><label id="m_id">#</label></td>
-                        <td><input id="m_name" value="name"></td>
-                        <td><input id="m_color" value="color"></td>
-                    </tr>
-                </table>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                <button type="button" class="btn btn-primary" onclick="update()">提交更改</button>
-            </div>
+            <form id="myform">
+                <div class="modal-body">
+                    <table class="table table-bordered">
+                        <tr>
+                            <td><input name="id" id="m_id" value="#" readonly="readonly"></td>
+                            <td><input name="name" id="m_name" value="name" autocomplete="off"></td>
+                            <td><input name="color" id="m_color" value="color" autocomplete="off"></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">提交更改</button>
+                </div>
+            </form>
         </div><!-- /.modal-content -->
     </div><!-- /.modal -->
 </div>
