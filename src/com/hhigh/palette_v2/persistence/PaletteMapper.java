@@ -14,7 +14,9 @@ public interface PaletteMapper {
 
     void save(Palette palette);
 
-    void delete(String id);
+    void delete(int id);
 
     void update(Palette palette);
+
+    int getrowcount();
 }

@@ -2,6 +2,7 @@
 <!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.hhigh.palette_v2.persistence.PaletteMapper">
     <resultMap type="com.hhigh.palette_v2.domain.Palette" id="paletteMapper">
+        <result column="id" property="id"/>
         <result column="name" property="name"/>
         <result column="color" property="color"/>
     </resultMap>
@@ -13,12 +14,17 @@
     <insert id="save" parameterType="com.hhigh.palette_v2.domain.Palette">
         INSERT INTO records (name, color) VALUES (#{name}, #{color})
     </insert>
-    <delete id="delete" parameterType="java.lang.String">
+    <delete id="delete" parameterType="java.lang.Integer">
         DELETE FROM records
         WHERE id = #{id}
     </delete>
     <update id="update" parameterType="com.hhigh.palette_v2.domain.Palette">
-        UPDATE records SET name=#{name}, color=#{color} WHERE id=#{id}
+        UPDATE records
+        SET name = #{name}, color = #{color}
+        WHERE id = #{id}
     </update>
-
+    <select id="getrowcount" resultType="java.lang.Integer">
+        SELECT COUNT(id)
+        FROM records
+    </select>
 </mapper>

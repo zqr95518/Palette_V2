@@ -4,7 +4,7 @@ package com.hhigh.palette_v2.domain;
  * Created by 乔然 on 2016/8/8.
  */
 public class Palette {
-    String id;
+    int id;
     String name;
     String color;
 
@@ -12,11 +12,11 @@ public class Palette {
         return name;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 

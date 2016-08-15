@@ -13,14 +13,24 @@
     <link href="css/style.min.css?v=3.2.0" rel="stylesheet">
     <script src="js/json2.js"></script>
     <script src="js/angular-1.0.1.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/pageGroup.css"/>
+    <script type="text/javascript" src="js/pageGroup.js"></script>
+    <style type="text/css">
+        .sortth{
+            cursor: pointer;
+        }
+    </style>
     <title>RGB调色板</title>
     <script>
         var datas;
+        var pagesize = 2;
         function refresh() {
             var ele = document.querySelector("[ng-controller=tablectrl]");
             angular.element(ele).scope().update();
         }
         function tablectrl($scope) {
+            $scope.col = 'id';//默认按编号列排序
+            $scope.desc = 0;//默认排序条件升序
             $scope.update = function () {
                 $scope.records = datas;
                 $scope.$apply();
@@ -28,20 +38,10 @@
             $scope.records = datas;
         }
         function getdatas() {
-            $.ajax({
-                url: "mvc/PaletteController/getAll",
-                scriptCharset: 'UTF-8',
-                dataType: 'json',
-                error: function () {
-                    alert("error!");
-                },
-                success: function (data) {
-                    datas = data;
-                    refresh();
-                },
-            });
+            refreshpager();
+            method(1);
         }
-        function checkrange(e) {
+        /*function checkrange(e) {
             if (Number(e) > 255) {
                 $("#warn").text("数字不应大于255")
             } else if (Number(e) < 0) {
@@ -49,7 +49,7 @@
             } else {
                 $("#warn").text("")
             }
-        }
+        }*/
         function cast16(e) {
             if (Number(e) < 10) {
                 return "0" + Number(e).toString(16)
@@ -164,11 +164,6 @@
                         scriptCharset: 'UTF-8',
                         dataType: 'json',
                         data: $("#myform").serialize(),
-/*                        success: function () {
-                         alert("a");
-                         $("#myModal").modal('hide');
-                         getdatas();
-                         }*/
                     });
                 }
             });
@@ -181,13 +176,12 @@
                 $.ajax({
                     url: "mvc/PaletteController/delete",
                     scriptCharset: 'UTF-8',
-                    dataType: 'json',
                     data: {id: id},
                     success: function (data) {
                         getdatas();
                     },
                     error: function (e) {
-                        alert(e);
+                        alert(JSON.stringify(e));
                     }
                 });
             }
@@ -268,10 +262,54 @@
             }
             clipboardData.setData(data);
         }
+        function refreshpager() {
+            $.ajax({
+                url: "mvc/PaletteController/getrowcount",
+                scriptCharset: 'UTF-8',
+                async: false,
+                dataType: 'json',
+                success: function (jsonrowcount) {
+                    rowcount = jsonrowcount.rowcount;
+                    $("#pagecount").text(parseInt((rowcount - 1) / pagesize) + 1);
+                },
+                error: function (e) {
+                    alert(JSON.stringify(e));
+                }
+            });
+            var pageCount = $("#pagecount").text();//模拟后台总页数
+            //生成分页按钮
+            if (pageCount > 5) {
+                flag = true;
+                page_icon(1, 5, 0);
+            } else {
+                flag = true;
+                page_icon(1, pageCount, 0);
+            }
+        }
+
+        function method(index) {
+            $.ajax({
+                url: "mvc/PaletteController/getByPage",
+                scriptCharset: 'UTF-8',
+                async: false,
+                dataType: 'json',
+                data:{
+                    page:index,
+                    pagesize:this.pagesize
+                },
+                success: function (data) {
+                    datas = data;
+                    refresh();
+                },
+                error: function (e) {
+                    alert(JSON.stringify(e));
+                }
+            });
+        }
     </script>
 </head>
 <body class="gray-bg">
-<div class="wrapper wrapper-content animated fadeInRight" ng-app="">
+<div class="wrapper animated fadeInRight" ng-app="">
     <div class="row">
         <h1 style="text-align: center">RGB调色板</h1>
     </div>
@@ -307,7 +345,8 @@
     <div class="row col-sm-6 col-sm-offset-3">
         <table class="table pull-right" style="border: hidden">
             <tr>
-                <td width="40%"><h3 style="text-align: center" id="warn">&nbsp;</h3></td>
+                <td width="30%"><h3 style="text-align: center" id="warn">&nbsp;</h3></td>
+                <td><label id="pagecount" style="visibility: hidden"></label></td>
                 <td><label class="control-label pull-right">名称：</label></td>
                 <td><input type="text" class="form-control pull-right" id="name"></td>
                 <td>
@@ -320,13 +359,13 @@
         <div class="col-sm-8 col-sm-offset-2" ng-controller="tablectrl">
             <table class="table table-bordered table-striped" id="recordtable">
                 <tr class="alert-info">
-                    <th>编号</th>
-                    <th>名称</th>
+                    <th class="sortth" ng-click="col='id';desc=!desc">编号</th>
+                    <th class="sortth" ng-click="col='name';desc=!desc">名称</th>
                     <th>颜色</th>
-                    <th>颜色编码</th>
+                    <th class="sortth" ng-click="col='color';desc=!desc">颜色编码</th>
                     <th>操作</th>
                 </tr>
-                <tr ng-repeat="x in records">
+                <tr ng-repeat="x in records|orderBy:col:desc">
                     <td>{{x.id}}</td>
                     <td>{{x.name}}</td>
                     <td bgcolor="{{x.color}}"></td>
@@ -341,6 +380,19 @@
             </table>
         </div>
     </div>
+        <div id="pageGro" class="cb center-block" style="width: 300px">
+            <div class="pageUp">上一页</div>
+            <div class="pageList">
+                <ul id="list" class="list-unstyled" style="list-style: none">
+                    <li>1</li>
+                    <li>2</li>
+                    <li>3</li>
+                    <li>4</li>
+                    <li>5</li>
+                </ul>
+            </div>
+            <div class="pageDown">下一页</div>
+        </div>
 </div>
 
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
