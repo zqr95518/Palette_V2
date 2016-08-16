@@ -23,7 +23,7 @@
     <title>RGB调色板</title>
     <script>
         var datas;
-        var pagesize = 2;
+        var pagesize = 5;
         function refresh() {
             var ele = document.querySelector("[ng-controller=tablectrl]");
             angular.element(ele).scope().update();
@@ -41,15 +41,6 @@
             refreshpager();
             method(1);
         }
-        /*function checkrange(e) {
-            if (Number(e) > 255) {
-                $("#warn").text("数字不应大于255")
-            } else if (Number(e) < 0) {
-                $("#warn").text("数字不应小于0")
-            } else {
-                $("#warn").text("")
-            }
-        }*/
         function cast16(e) {
             if (Number(e) < 10) {
                 return "0" + Number(e).toString(16)
@@ -103,32 +94,26 @@
             }
             $("#red").change(function () {
                 $("#red_text").val($("#red").val());
-                $("#warn").text("");
                 fresh();
             });
             $("#green").change(function () {
                 $("#green_text").val($("#green").val());
-                $("#warn").text("");
                 fresh();
             });
             $("#blue").change(function () {
                 $("#blue_text").val($("#blue").val());
-                $("#warn").text("");
                 fresh();
             });
             $("#red_text").on('valuechange', function (e, previous) {
                 $("#red").val($("#red_text").val());
-                //               checkrange($ ("#red_text").val());
                 fresh();
             });
             $("#green_text").on('valuechange', function (e, previous) {
                 $("#green").val($("#green_text").val());
-//                checkrange($ ("#green_text").val());
                 fresh();
             });
             $("#blue_text").on('valuechange', function (e, previous) {
                 $("#blue").val($("#blue_text").val());
-//                checkrange($ ("#blue_text").val());
                 fresh();
             });
             $("#save").click(function () {
@@ -164,6 +149,30 @@
                         scriptCharset: 'UTF-8',
                         dataType: 'json',
                         data: $("#myform").serialize(),
+                    });
+                }
+            });
+            $("#input_auto").on('valuechange', function (e, previous) {
+                if($.trim($("#input_auto").val()).length<1){
+                    $("#pageGro").show();
+                    getdatas();
+                    refreshpager();
+                }else{
+                    $("#pageGro").hide();
+                    $.ajax({
+                        url: "mvc/PaletteController/autosearch",
+                        scriptCharset: 'UTF-8',
+                        dataType: 'json',
+                        data:{
+                            input_auto:$("#input_auto").val()
+                        },
+                        success: function (data) {
+                            datas = data;
+                            refresh();
+                        },
+                        error: function (e) {
+                            alert(JSON.stringify(e));
+                        }
                     });
                 }
             });
@@ -268,6 +277,10 @@
                 scriptCharset: 'UTF-8',
                 async: false,
                 dataType: 'json',
+                data:{
+                    input_name:$("#input_name").val(),
+                    input_color:$("#input_color").val()
+                },
                 success: function (jsonrowcount) {
                     rowcount = jsonrowcount.rowcount;
                     $("#pagecount").text(parseInt((rowcount - 1) / pagesize) + 1);
@@ -286,7 +299,6 @@
                 page_icon(1, pageCount, 0);
             }
         }
-
         function method(index) {
             $.ajax({
                 url: "mvc/PaletteController/getByPage",
@@ -295,7 +307,9 @@
                 dataType: 'json',
                 data:{
                     page:index,
-                    pagesize:this.pagesize
+                    pagesize:this.pagesize,
+                    input_name:$("#input_name").val(),
+                    input_color:$("#input_color").val()
                 },
                 success: function (data) {
                     datas = data;
@@ -310,20 +324,17 @@
 </head>
 <body class="gray-bg">
 <div class="wrapper animated fadeInRight" ng-app="">
+    <div class="row"><h1 style="text-align: center">RGB调色板</h1></div>
     <div class="row">
-        <h1 style="text-align: center">RGB调色板</h1>
-    </div>
-    <div class="row">
-        <div class="col-sm-6 col-sm-offset-3">
-            <table class="table table-bordered">
+        <div class="col-sm-8 col-sm-offset-2">
+            <table class="table table-bordered" style="margin-bottom: 10px">
                 <tr>
-                    <td rowspan="3" id="palette" bgcolor="#000000"></td>
+                    <td rowspan="4" id="palette" bgcolor="#000000"></td>
                     <td><label class="control-label">红色：</label></td>
                     <td><input type="range" id="red" max="255" min="0" step="1" value="0"></td>
                     <td><input type="text" onkeyup="keyup(this)" onbeforepaste="beforepaste(this)"
                                class="form-control" id="red_text" value="0"></td>
                     <td><label class="control-label" style="width: 6px" id="red_hex">00</label></td>
-
                 </tr>
                 <tr>
                     <td><label class="control-label">绿色：</label></td>
@@ -339,19 +350,22 @@
                                class="form-control" id="blue_text" value="0"></td>
                     <td><label class="control-label" style="width: 6px" id="blue_hex">00</label></td>
                 </tr>
+                <tr>
+                    <td><label class="control-label">名称：</label></td>
+                    <td><input type="text" class="form-control" id="name"></td>
+                    <td><button class="spinner-buttons" id="save">保存当前配色</button></td>
+                    <td><label id="pagecount" style="visibility: hidden"></label></td>
+                </tr>
             </table>
         </div>
     </div>
     <div class="row col-sm-6 col-sm-offset-3">
-        <table class="table pull-right" style="border: hidden">
+        <table class="table" style="border: hidden; margin-bottom: 10px">
             <tr>
-                <td width="30%"><h3 style="text-align: center" id="warn">&nbsp;</h3></td>
-                <td><label id="pagecount" style="visibility: hidden"></label></td>
-                <td><label class="control-label pull-right">名称：</label></td>
-                <td><input type="text" class="form-control pull-right" id="name"></td>
-                <td>
-                    <button class="spinner-buttons pull-right" id="save">保存当前配色</button>
-                </td>
+                <td><input id="input_auto" class="form-control pull-right" type="text" placeholder="自动查询"></td>
+                <td><input id="input_name" class="form-control pull-right" type="text" placeholder="按名称查询"></td>
+                <td><input id="input_color" class="form-control pull-right" type="text" placeholder="按颜色查询"></td>
+                <td><input class="spinner-buttons pull-right" onclick="getdatas()" type="button" value="查询"></td>
             </tr>
         </table>
     </div>
@@ -359,10 +373,13 @@
         <div class="col-sm-8 col-sm-offset-2" ng-controller="tablectrl">
             <table class="table table-bordered table-striped" id="recordtable">
                 <tr class="alert-info">
-                    <th class="sortth" ng-click="col='id';desc=!desc">编号</th>
-                    <th class="sortth" ng-click="col='name';desc=!desc">名称</th>
+                    <th class="sortth" ng-click="col='id';desc=!desc">编号
+                        <img src="images/asc.gif" ng-show="col=='id'&&!desc"><img src="images/desc.gif" ng-show="col=='id'&&desc"></th>
+                    <th class="sortth" ng-click="col='name';desc=!desc">名称
+                        <img src="images/asc.gif" ng-show="col=='name'&&!desc"><img src="images/desc.gif" ng-show="col=='name'&&desc"></th>
                     <th>颜色</th>
-                    <th class="sortth" ng-click="col='color';desc=!desc">颜色编码</th>
+                    <th class="sortth" ng-click="col='color';desc=!desc">颜色编码
+                        <img src="images/asc.gif" ng-show="col=='color'&&!desc"><img src="images/desc.gif" ng-show="col=='color'&&desc"></th>
                     <th>操作</th>
                 </tr>
                 <tr ng-repeat="x in records|orderBy:col:desc">
@@ -394,7 +411,6 @@
             <div class="pageDown">下一页</div>
         </div>
 </div>
-
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -405,6 +421,11 @@
             <form id="myform">
                 <div class="modal-body">
                     <table class="table table-bordered">
+                        <tr class="alert-info">
+                            <th>编号</th>
+                            <th>名称</th>
+                            <th>颜色编码</th>
+                        </tr>
                         <tr>
                             <td><input name="id" id="m_id" value="#" readonly="readonly"></td>
                             <td><input name="name" id="m_name" value="name" autocomplete="off"></td>

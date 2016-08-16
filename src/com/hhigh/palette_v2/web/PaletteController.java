@@ -43,14 +43,16 @@ public class PaletteController {
         }
     }
 
-    @RequestMapping(value="/getByPage")
+    @RequestMapping(value = "/getByPage")
     public void getbypage(@RequestParam(value = "page") int page,
                           @RequestParam(value = "pagesize") int pagesize,
-                          HttpServletRequest request, HttpServletResponse response){
+                          @RequestParam(value = "input_name") String input_name,
+                          @RequestParam(value = "input_color") String input_color,
+                          HttpServletRequest request, HttpServletResponse response) {
         try {
             String sortString = "id.asc";//如果你想排序的话逗号分隔可以排序多列
-            PageBounds pageBounds = new PageBounds(page, pagesize , Order.formString(sortString));
-            List<Palette> records = paletteService.getbypage(pageBounds);
+            PageBounds pageBounds = new PageBounds(page, pagesize, Order.formString(sortString));
+            List<Palette> records = paletteService.getbypage(pageBounds, input_name, input_color);
             JSONArray jsonArray = JSONArray.fromObject(records);
             response.setCharacterEncoding("utf-8");
             response.setContentType("text/html");
@@ -99,14 +101,33 @@ public class PaletteController {
     }
 
     @RequestMapping("/getrowcount")
-    public void getpagenumber(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void getpagenumber(@RequestParam(value = "input_name") String input_name,
+                              @RequestParam(value = "input_color") String input_color,
+                              HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html;charset=utf-8");
-        String list = "{'rowcount':" + paletteService.getrowcount() + "}";
+        String list = "{'rowcount':" + paletteService.getrowcount(input_name, input_color) + "}";
         JSONObject json = JSONObject.fromObject(list);
         response.setCharacterEncoding("utf-8");
         response.setContentType("text/html");
         response.getWriter().write(json.toString());
         response.getWriter().flush();
         response.getWriter().close();
+    }
+
+    @RequestMapping("/autosearch")
+    public void autosearch(@RequestParam(value = "input_auto") String input_auto,
+                              HttpServletRequest request, HttpServletResponse response) throws IOException {
+        try {
+            List<Palette> records = paletteService.autosearch(input_auto);
+            JSONArray jsonArray = JSONArray.fromObject(records);
+            response.setCharacterEncoding("utf-8");
+            response.setContentType("text/html");
+            response.getWriter().write(jsonArray.toString());
+            response.getWriter().flush();
+            response.getWriter().close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 }

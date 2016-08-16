@@ -7,9 +7,10 @@
         <result column="color" property="color"/>
     </resultMap>
 
-    <select id="getall" resultMap="paletteMapper">
+    <select id="getall" resultMap="paletteMapper" parameterType="java.util.Map">
         SELECT *
         FROM records
+        WHERE name LIKE '%${input_name}%' AND color LIKE '%${input_color}%'
     </select>
     <insert id="save" parameterType="com.hhigh.palette_v2.domain.Palette">
         INSERT INTO records (name, color) VALUES (#{name}, #{color})
@@ -23,8 +24,14 @@
         SET name = #{name}, color = #{color}
         WHERE id = #{id}
     </update>
-    <select id="getrowcount" resultType="java.lang.Integer">
+    <select id="getrowcount" parameterType="java.util.Map" resultType="java.lang.Integer">
         SELECT COUNT(id)
         FROM records
+        WHERE name LIKE '%${input_name}%' AND color LIKE '%${input_color}%'
+    </select>
+    <select id="autosearch" resultMap="paletteMapper" parameterType="java.util.Map">
+        SELECT *
+        FROM records
+        WHERE name LIKE '%${input_auto}%' OR color LIKE '%${input_auto}%'
     </select>
 </mapper>

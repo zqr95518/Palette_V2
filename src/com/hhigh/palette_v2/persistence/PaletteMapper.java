@@ -4,13 +4,14 @@ import com.hhigh.palette_v2.domain.Palette;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by 乔然 on 2016/8/8.
  */
 @Repository
 public interface PaletteMapper {
-    List<Palette> getall();
+    List<Palette> getall(Map map);
 
     void save(Palette palette);
 
@@ -18,5 +19,7 @@ public interface PaletteMapper {
 
     void update(Palette palette);
 
-    int getrowcount();
+    int getrowcount(Map map);
+
+    List<Palette> autosearch(Map map);
 }
