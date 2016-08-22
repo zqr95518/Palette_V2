@@ -27,19 +27,12 @@ public class PaletteService {
         return paletteMapper.getall(null);
     }
 
-    public List<Palette> autosearch(String input_auto) {
-        Map<String, Object> params = new HashMap<String, Object>();
-        params.put("input_auto", input_auto);
-        return paletteMapper.autosearch(params);
-    }
-
-    public List<Palette> getbypage(PageBounds pageBounds, String input_name, String input_color) {
+    public List<Palette> getbypage(PageBounds pageBounds, String input_data) {
         List<Palette> data = null;
         try {
             SqlSession session = sqlSessionFactory.openSession();
             Map<String, Object> params = new HashMap<String, Object>();
-            params.put("input_name", input_name);
-            params.put("input_color", input_color);
+            params.put("input_data", input_data);
             data = session.selectList(namespace + ".getall", params, pageBounds);
         } catch (Exception e) {
             e.printStackTrace();
@@ -59,10 +52,9 @@ public class PaletteService {
         paletteMapper.update(palette);
     }
 
-    public int getrowcount(String input_name, String input_color) {
+    public int getrowcount(String input_data) {
         Map<String, Object> params = new HashMap<String, Object>();
-        params.put("input_name", input_name);
-        params.put("input_color", input_color);
+        params.put("input_data", input_data);
         return paletteMapper.getrowcount(params);
     }
 }

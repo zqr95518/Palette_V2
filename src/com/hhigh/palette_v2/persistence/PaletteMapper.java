@@ -20,6 +20,4 @@ public interface PaletteMapper {
     void update(Palette palette);
 
     int getrowcount(Map map);
-
-    List<Palette> autosearch(Map map);
 }
